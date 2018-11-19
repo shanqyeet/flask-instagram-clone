@@ -7,7 +7,10 @@ from models import User
 
 @login.user_loader
 def load_user(user_id):
-    return User.query.get(user_id)
+    try:
+        return User.query.get(user_id)
+    except:
+        return None
 
 @app.route("/")
 def home():
