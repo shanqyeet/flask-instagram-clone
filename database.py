@@ -7,7 +7,7 @@ from flask_login import LoginManager
 basedir = os.path.abspath(os.path.dirname(__file__))
 SQLALCHEMY_DATABASE_URI = os.environ['DATABASE_URL']
 
-app = Flask(__name__, template_folder='instagram/templates')
+app = Flask(__name__, template_folder='templates')
 
 app.config["SQLALCHEMY_DATABASE_URI"] = SQLALCHEMY_DATABASE_URI
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False

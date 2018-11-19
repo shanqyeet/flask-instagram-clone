@@ -15,9 +15,9 @@
                 <a href="/">Home</a>
             </div>
             
-            {% if session.get('logged_in') and session['logged_in'] == True %}
+            {% if current_user %}
                 <div class="col-lg-1">
-                    <a href="/users/{{session['id']}}">Dashboard</a>
+                    <a href="/users/{{current_user.id}}">Dashboard</a>
                 </div>
                 <div class="col-lg-1">
                     <form action="/sessions"  method="post">

@@ -1,82 +1,77 @@
 from flask import Flask, render_template, redirect, request, flash, session, url_for
-from database import db, app
+from database import db, app, login
 from werkzeug.security import generate_password_hash, check_password_hash
+from users.forms import SignupForm
+from flask_login import  current_user, login_user, login_required, logout_user
 from models import User
 
+
+@login.user_loader
+def load_user(id):
+   return User.query.get(int(id))
 
 @app.route("/")
 def home():
     return render_template('home.html')
 
-@app.route("/sign_up", methods=['GET'])
+@app.route("/protected")
+@login_required
+def protected():
+    return "protected area"
+
+@app.route("/signup", methods=['GET', 'POST'])
 def signup():
-    return render_template('signup.html')
+    form = SignupForm()
 
-@app.route("/users/new", methods=['POST'])
-def create():
-    messages = {}
-    username = request.form.get('username')
-    password = request.form.get('password')
+    if request.method == 'GET':
+        return render_template('signup.html', form=form)
+    elif request.method == 'POST':
+        if form.validate_on_submit():
+            if User.query.filter_by(username=form.username.data).first():
+                return "Username already exists"
+            else:
+                newuser = User(form.username.data, form.password.data)
+                db.session.add(newuser)
+                db.session.commit()
+                flash("Your account has been successfully created!")
+                return redirect('/')
+        else:
+            return "Form didn't validate"
 
-    if not username:
-        messages["username"] = "username must exist"
 
-    if not password:
-        messages["password"] = "password must exist"
-
-    if len(messages) > 0:
-        flash(messages)
-        return render_template('signup.html',messages=messages)
-    else:
-        hashed_password = generate_password_hash(password)
-        new_user = User(username, hashed_password)
-        db.session.add(new_user)
-        db.session.commit()
-        flash("congrats!  your account has been created")
-        return redirect('/')
+@app.route("/signin", methods=['GET', 'POST'])
+def signin():
+    form = SignupForm()
+    if request.method == "GET":
+        return render_template("signin.html",form=form)
+    elif request.method == "POST":
+        if form.validate_on_submit():
+            user = User.query.filter_by(username = form.username.data).first()
+            if user:
+                if user.password == form.password.data:
+                    login_user(user)
+                    flash("We have successfully signed you in!")
+                    return redirect(f'/users/{user.id}')
+                else:
+                    flash("Wrong password, access denied")
+                    return redirect(request.referrer)
+            else:
+                flash("User does not exist")
+                return redirect(request.referrer)
+        else:
+            flash("Form not validated")
+            return redirect(request.referrer)
 
 @app.route('/users/<id>', methods=['GET'])
 def show(id):
-    current_user = User.query.get(id)
-    if current_user and session.get('id') and current_user.id == session['id']:
+    user = User.query.get(id)
+    if current_user == user:
         return render_template('show.html', current_user = current_user)
     else:
         flash('Sorry you are not authorized to access the page')
         return redirect('/')
 
-@app.route("/sign_in", methods=['GET'])
-def signin():
-    if session.get('logged_in') and session['logged_in'] == True:
-        return redirect(f"/users/{session['id']}")
-    else:
-        return render_template('signin.html')
 
-@app.route("/sessions", methods=["POST"])
-def sessions():
-    method = request.form.get('_method')
-    if method and method == "DELETE":
-        session.pop('id', None)
-        session.pop('logged_in', None)
-        flash('Successfully Logged Out!')
-        return redirect('/')
-    else:
-        current_user_username = request.form.get('username')
-        current_user_password = request.form.get('password')
-        current_user = User.query.filter_by(username= current_user_username).first()
-        if  current_user:
-            session['id'] = current_user.id
-        else:
-            flash("user doesn't exist")
-            return redirect('/')
-
-        result = check_password_hash(current_user.password, current_user_password)
-        if result:
-            session['logged_in'] = True
-            flash('Hey, we have successfully logged you in!')
-            return redirect(f'/users/{current_user.id}')
-        else:
-            flash('Password given is wrong, access denied')
-            return redirect('/')
 
 if __name__ == '__main__':
     app.run()
