@@ -1,0 +1,12 @@
+.home-page__container--bg {
+    background-color: beige;
+    width: 100vw;
+    min-height: 100vh;
+}
+
+#home-page__images--phone {
+    width: 65%;
+    margin-top: 50%;
+    margin-left: 50%;
+    transform: translate(-50%, -50%);
+}

@@ -1,0 +1,22 @@
+{% extends '_base.html'%}
+{% block flash %}
+    {% with message = get_flashed_messages() %}
+        {% if message %}
+            <div class="alert alert-info text-center">        
+                <p>{{message[0]}}</p>
+            </div>
+        {% endif %}
+    {% endwith %}
+{% endblock %}
+{% block content %}
+    <div class="home-page__container--bg">
+        <div class="containter row">
+            <div class="home-page__left-pane col-lg-6 col-md-6">
+                <img src="/static/insta-home-phone.png" id="home-page__images--phone" alt="" />
+            </div>
+            <div class="home-page__right-page col-lg-6 col-md-6">
+                <h1 class="text-center">Welcome to Instagram</h1>
+            </div>
+        </div>
+    </div>
+{% endblock %}
