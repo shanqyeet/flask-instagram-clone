@@ -5,14 +5,15 @@ from users.forms import SignupForm
 from flask_login import  current_user, login_user, login_required, logout_user
 from models import User
 
-
 @login.user_loader
-def load_user(id):
-   return User.query.get(int(id))
+def load_user(user_id):
+    return User.query.get(user_id)
 
 @app.route("/")
 def home():
-    return render_template('home.html')
+    form = SignupForm()
+
+    return render_template('home.html', form=form)
 
 @app.route("/protected")
 @login_required
@@ -30,7 +31,7 @@ def signup():
             if User.query.filter_by(username=form.username.data).first():
                 return "Username already exists"
             else:
-                newuser = User(form.username.data, form.password.data)
+                newuser = User(username=form.username.data, email=form.email.data, password=form.password.data)
                 db.session.add(newuser)
                 db.session.commit()
                 flash("Your account has been successfully created!")
@@ -65,13 +66,20 @@ def signin():
 @app.route('/users/<id>', methods=['GET'])
 def show(id):
     user = User.query.get(id)
+    print(current_user)
     if current_user == user:
         return render_template('show.html', current_user = current_user)
     else:
         flash('Sorry you are not authorized to access the page')
         return redirect('/')
 
-
+@app.route('/logout', methods=['POST'])
+def logout():
+    print("in logout??")
+    print(current_user)
+    print(current_user.is_anonymous)
+    logout_user()
+    return redirect('/')
 
 if __name__ == '__main__':
     app.run()

@@ -1,31 +1,16 @@
-
-{% extends '_base.html' %}
-{% block flash %}
-    {% with message = get_flashed_messages() %}
-        {% if message %}
-            <div class="alert alert-info text-center">        
-                <p>{{message[0]}}</p>
-            </div>
-        {% endif %}
-    {% endwith %}
-{% endblock %}
-{% block content %}
-    {% if messages %}
-        {% if messages['username'] %}
-            <p>{{messages['username']}}</p>
-        {% endif %}
-
-        {% if messages['password'] %}
-            <p>{{messages['password']}}</p>
-        {% endif %}
-
-    {% endif %}
+<div class="container"> 
     <h1>Log In</h1>
+    
     <form action="{{url_for('signin')}}" method="post">
         {{ form.hidden_tag() }}
-        {{ form.username.label }} {{ form.username(size=25) }}
-        {{ form.password.label }} {{ form.password(size=25) }}
-        <input type="submit" name="Log In" id="Log In" value="Log In" />
-    </form>
+        <div class="form-group">
+            {{ form.username.label }} {{ form.username(size=20,class="form-control") }}
+        </div>
+        <div class="form-group">
+            {{ form.password.label }} {{ form.password(size=20, class="form-control") }}
+        </div>
+        <input type="submit" class="btn btn-primary"  name="Log In" id="Log In" value="Log In" />
+    </form>    
+</div>
+    
 
-{% endblock %}

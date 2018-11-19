@@ -5,6 +5,7 @@ from wtforms.validators import DataRequired
 class SignupForm(FlaskForm):
     username = StringField('Username', validators=[DataRequired()])
     password = PasswordField('Password', validators=[DataRequired()])
+    email = StringField('Email')
     submit = SubmitField('Sign In')
 
 
