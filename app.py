@@ -52,7 +52,7 @@ def signin():
         if form.validate_on_submit():
             user = User.query.filter_by(username = form.username.data).first()
             if user:
-                if user.password == form.password.data:
+                if user.salt_tasting(form.password.data):
                     login_user(user)
                     flash("We have successfully signed you in!")
                     return redirect(f'/users/{user.id}')
